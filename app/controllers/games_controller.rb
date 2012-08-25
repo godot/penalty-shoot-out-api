@@ -1,12 +1,4 @@
 class GamesController < ApplicationController
-  @@current_game = nil
-  def self.current_game
-    @@current_game
-  end
-  def self.current_game=(game)
-    @@current_game = game
-  end
-
   before_filter :check_game, except:[:create, :index]
   def perform
     turn = current_game.next_turn
@@ -23,7 +15,7 @@ class GamesController < ApplicationController
   end
 
   def index
-    render json: Index.new(format:'json',user:current_user)
+    render json: Presenters::Index.new(format:'json',user:current_user)
   end
 
   def new
@@ -47,5 +39,14 @@ class GamesController < ApplicationController
   end
   def check_game
     redirect_to root_url if current_game.nil?
+  end
+
+
+  @@current_game = nil
+  def self.current_game
+    @@current_game
+  end
+  def self.current_game=(game)
+    @@current_game = game
   end
 end
