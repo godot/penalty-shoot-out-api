@@ -5,7 +5,7 @@ class Game
 
   TURN_LIMIT = 10
   TURN_TYPES = [:shoot, :save]
-  CHOISES = (0..15).to_a
+  CHOISES = (0..14).to_a
 
   def initialize(name, player, player2 = User::CPlayer.new("computer"))
     @name = name
@@ -21,6 +21,7 @@ class Game
     turns.each do |turn|
       return turn unless turn.completed?
     end
+    report_or_next_turn
   end
 
   def finished?
@@ -29,11 +30,25 @@ class Game
     end
   end
 
-  def result
-    {
-      winner: players.sample,
-      turns: turns
-    }
+  def report_or_next_turn
+    if result.uniq.size == 1
+      Turn.new(TURN_TYPES[@turns.size%2]).tap do |turn|
+        self.turns << turn
+      end
+    else
+      Turn.new(:final_result).tap do |report|
+        report.update(result)
+      end
+    end
+  end
+
+  def result()
+    [0,0].tap do |final_result|
+      turns.each_with_index do |turn,idx|
+        final_result[idx%2] += turn.result
+        return final_result if (final_result[0] - final_result[1]).abs == 3
+      end
+    end
   end
 
 
@@ -58,8 +73,12 @@ class Game
     end
 
     def result
-      raise 'round_incomplete' unless completed?
-      @choises[0] == @choises[1]
+      return :pending unless completed?
+      @choises[0] == @choises[1] ? 0 : 1
     end
+  end
+
+  class FinalResult < Turn
+    
   end
 end

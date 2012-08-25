@@ -7,14 +7,18 @@ class GamesController < ApplicationController
     @@current_game = game
   end
 
-  before_filter :check_game, except:[:create]
+  before_filter :check_game, except:[:create, :index]
   def perform
     turn = current_game.next_turn
 
-    choises = current_game.players.map do |player|
-      player.is_a?(User::CPlayer) ? player.pick(current_game.class::CHOISES) : params[:choise].to_i
+    if turn.type == :final_result
+      #redirect to final page
+    else
+      choises = current_game.players.map do |player|
+        player.is_a?(User::CPlayer) ? player.pick(current_game.class::CHOISES) : params[:choise].to_i
+      end
+      turn.update(choises)
     end
-    turn.update(choises)
     redirect_to current_game
   end
 
@@ -31,8 +35,7 @@ class GamesController < ApplicationController
   end
 
   def show
-    game = self.class.current_game
-    render json: Presenters::Game.new(format:'json',user:current_user,game:game)
+    render json: Presenters::Game.new(format:'json',user:current_user,game:current_game)
   end
 
   private

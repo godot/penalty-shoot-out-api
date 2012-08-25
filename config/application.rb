@@ -13,7 +13,7 @@ end
 
 module PenaltyShootOutApi
   class Application < Rails::Application
-    config.representer.default_url_options = {:host => "192.168.208.247:3000"}
+    config.representer.default_url_options = {:host => "localhost:3000"}
 
     config.middleware.use Rack::Cors do
       allow do
