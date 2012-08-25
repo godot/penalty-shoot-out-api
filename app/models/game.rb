@@ -1,58 +1,65 @@
 class Game
-  attr_accessor :name, :users
+  attr_accessor :name, :players
   attr_accessor :turns
+  attr_accessor :current_turn
 
   TURN_LIMIT = 10
+  TURN_TYPES = [:shoot, :save]
+  CHOISES = (0..15).to_a
 
-  def initialize(name)
+  def initialize(name, player, player2 = User::CPlayer.new("computer"))
     @name = name
-    @users = []
-    @turns = Array.new(TURN_LIMIT).fill(Turn.new)
+    @players = [player, player2].shuffle
+    @turns = Array.new(TURN_LIMIT).fill {|i| Turn.new(TURN_TYPES[i%2]) }
   end
 
   def process
-    raise 'missing_player' if self.missing_player?
+    return result if finished?
   end
 
-  def missing_player?
-    self.users.size < 2
+  def next_turn
+    turns.each do |turn|
+      return turn unless turn.completed?
+    end
   end
+
+  def finished?
+    turns.each do |turn|
+      return unless turn.completed?
+    end
+  end
+
+  def result
+    {
+      winner: players.sample,
+      turns: turns
+    }
+  end
+
 
   def to_param
     self.name
   end
 
-  def finished?
-    false
-  end
-
   class Turn
     attr_accessor :choises
-    def initialize
-      @choises = [Choise.new,Choise.new]
+    attr_accessor :type
+    def initialize(type = :none)
+      @type = type
+      @choises = Array.new(2)
+    end
+
+    def update(values)
+      @choises = values
     end
 
     def completed?
-      @choises.map(&:done?) == [true,true]
+      @choises.any?
     end
 
     def result
       raise 'round_incomplete' unless completed?
-
       @choises[0] == @choises[1]
-    end
-  end
-
-  class Choise
-    VALUES = (0..15).to_a
-    attr_accessor :value
-
-    def done?
-      !!value
-    end
-
-    def ==(other)
-      self.value == other.value
     end
   end
 end

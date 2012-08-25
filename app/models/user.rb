@@ -8,4 +8,10 @@ class User
   def to_param
     self.name
   end
+
+  class CPlayer < User
+    def pick(choises)
+      choises.sample
+    end
+  end
 end
