@@ -1,4 +1,6 @@
 class User
+  extend ActiveModel::Naming
+
   attr_accessor :name
 
   def initialize(name)
