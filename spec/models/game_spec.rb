@@ -24,15 +24,6 @@ describe Game do
     turn.should_not == turn2
   end
 
-  it ' playing the game' do
-    turn = subject.next_turn
-    turn.should == subject.turns.first
-    turn.update([1,2])
-
-    turn2 = subject.next_turn
-    turn.should_not == turn2
-  end
-
   describe Game::Turn do
     subject {Game::Turn.new }
     it { should_not be_completed }

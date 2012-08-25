@@ -2,7 +2,6 @@ class Game
   extend ActiveModel::Naming
   attr_accessor :name, :players
   attr_accessor :turns
-  attr_accessor :current_turn
 
   TURN_LIMIT = 10
   TURN_TYPES = [:shoot, :save]

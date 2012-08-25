@@ -16,9 +16,14 @@ module Presenters
         play_url(game, value)
       end
     end
+    property :current_turn
     property :choises
     property :user
     property :game
+
+    def current_turn
+      game.next_turn
+    end
 
     def user
       params[:user]
