@@ -12,14 +12,15 @@ module Presenters
       game_url(game,url_params)
     end
     link :action do
-      choises.map do |value|
+      available_choises.map do |value|
         play_url(game, value)
       end unless current_turn.type == :final_result
     end
+
     property :players
     property :current_turn
     property :status
-    property :choises
+    property :available_choises
 
 
     def current_turn
@@ -27,7 +28,9 @@ module Presenters
     end
 
     def status
-      game.turns.map(&:result)
+      game.turns.map do |turn|
+        {turn.type => turn.choises}
+      end
     end
 
     def players
@@ -38,7 +41,7 @@ module Presenters
       params[:game]
     end
 
-    def choises
+    def available_choises
       game.class::CHOISES
     end
 
